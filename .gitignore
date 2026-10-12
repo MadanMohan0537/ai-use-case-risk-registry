@@ -1,0 +1,7 @@
+__pycache__/
+*.py[cod]
+*.db
+.venv/
+*.egg-info/
+controlledger-report.json
+controlledger-audit.csv
