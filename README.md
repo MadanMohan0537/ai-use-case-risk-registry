@@ -83,6 +83,22 @@ The demo loads five synthetic systems, classifies them across all three tiers, m
 
 See [method and limitations](docs/METHOD.md) and [backlog](docs/BACKLOG.md).
 
+## Deployment
+
+Cloudflare Workers is the planned deployment target. It is not configured yet, and this repository is not deployed. There is no `wrangler.toml`, no Worker entry point, and no live `workers.dev` URL.
+
+When a Worker is configured, deploy it with:
+
+```bash
+npx wrangler deploy
+```
+
+Still needed before that command can run:
+
+- a `wrangler.toml`
+- a Worker entry point
+- for this Python package, either Cloudflare Python Workers or a JavaScript/TypeScript port
+
 ## License
 
 MIT
