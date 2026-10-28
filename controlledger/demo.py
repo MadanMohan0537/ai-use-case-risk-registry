@@ -9,6 +9,7 @@ from .controls import required_controls
 from .fixtures import systems
 from .models import Evidence
 from .rules import classify
+from .shared import shared_evidence_experiment
 
 
 def run_demo() -> dict:
@@ -29,6 +30,8 @@ def run_demo() -> dict:
         "portfolio": rows,
         "evidence_completion_rate": sum(row["evidence_complete"] for row in rows) / len(rows),
         "scope_change_experiment": {"seeded": len(seeded), "reopened": sum(item["material"] and bool(item["reopen_controls"]) for item in triggers), "false_negatives": sum(not item["material"] for item in triggers), "results": triggers},
+        "shared_evidence_experiment": shared_evidence_experiment(),
         "control_counts": {system.system_id: len(required_controls(classify(system))) for system in baseline},
         "csv": csv_export(rows),
     }
+

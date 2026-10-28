@@ -1,6 +1,6 @@
 # ControlLedger
 
-[![CI](https://github.com/MadanMohan0537/controlledger/actions/workflows/ci.yml/badge.svg)](https://github.com/MadanMohan0537/controlledger/actions/workflows/ci.yml)
+[![CI](https://github.com/MadanMohan0537/ai-use-case-risk-registry/actions/workflows/ci.yml/badge.svg)](https://github.com/MadanMohan0537/ai-use-case-risk-registry/actions/workflows/ci.yml)
 
 ControlLedger is a local, versioned inventory for AI systems. It converts structured intake into deterministic governance tiers, generates tier-specific control checklists, tracks dated evidence, shows portfolio completeness, and exports an audit-ready CSV.
 
@@ -17,8 +17,9 @@ ControlLedger is a local, versioned inventory for AI systems. It converts struct
 - Portfolio completeness view and CSV audit export.
 - Five reproducible synthetic systems spanning all tiers.
 - **P1 scope-change reclassification:** diff material fields and reopen relevant controls.
+- **P2 shared control evidence:** reuse immutable evidence versions across systems, keep applicability explicit, and invalidate dependent claims on expiry or supersession.
 
-Hosted UI, login, evidence uploads, jurisdiction-specific legal validation, shared-control reuse, reminders, and production security are planned—not implemented.
+Hosted UI, login, evidence uploads, jurisdiction-specific legal validation, reminders, and production security are planned—not implemented.
 
 ## Quick start
 
@@ -42,6 +43,8 @@ flowchart TD
     D --> E[Portfolio and audit export]
     A --> F[Scope diff]
     F --> C
+    D --> G[Shared evidence dependency]
+    G --> E
 ```
 
 ## P1 experiment
@@ -49,6 +52,18 @@ flowchart TD
 The frozen fixture applies four material changes to a low-risk FAQ assistant: full automation, biometric data, a child audience, and benefits eligibility. All four must reopen linked controls; a version-only update must not. The test records the denominator, reopened count, and false negatives.
 
 The fixture passes. This demonstrates workflow mechanics only—the rules remain illustrative until validated for a specific organization and jurisdiction.
+
+## P2 experiment
+
+The frozen dependency graph links five applicable system-control claims to two
+shared platform artifacts. That avoids three duplicate submissions. A new
+logging-evidence version supersedes three pinned claims, while an expired
+incident-plan artifact invalidates two more. All five seeded stale dependencies
+must be found, with applicability decisions stored independently from freshness.
+
+The experiment passes with zero false negatives and one explicit
+`not_applicable` exclusion. Reuse does not imply local applicability: every
+link still requires a rationale, control match, and pinned evidence version.
 
 ## Demo
 
@@ -59,3 +74,4 @@ See [method and limitations](docs/METHOD.md) and the [rigorous backlog](docs/BAC
 ## License
 
 MIT
+

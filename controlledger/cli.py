@@ -17,8 +17,9 @@ def main() -> None:
         json.dump(report, handle, indent=2, sort_keys=True, default=list)
     with open(args.csv, "w", encoding="utf-8", newline="") as handle:
         handle.write(csv_data)
-    print(json.dumps({k: v for k, v in report.items() if k not in {"portfolio", "scope_change_experiment"}}, indent=2))
+    print(json.dumps({k: v for k, v in report.items() if k not in {"portfolio", "scope_change_experiment", "shared_evidence_experiment"}}, indent=2))
 
 
 if __name__ == "__main__":
     main()
+

@@ -11,6 +11,12 @@ from controlledger.fixtures import systems
 from controlledger.models import Evidence
 from controlledger.rules import RULE_VERSION, classify
 from controlledger.store import Registry
+from controlledger.shared import (
+    EvidenceDependency,
+    SharedEvidence,
+    dependency_statuses,
+    shared_evidence_experiment,
+)
 
 
 class ControlLedgerTests(unittest.TestCase):
@@ -85,6 +91,49 @@ class ControlLedgerTests(unittest.TestCase):
         self.assertEqual(result["seeded"], result["reopened"])
         self.assertEqual(0, result["false_negatives"])
 
+    def test_shared_evidence_avoids_duplicate_submissions(self):
+        result = shared_evidence_experiment()
+        self.assertEqual(3, result["duplicate_submissions_avoided"])
+
+    def test_shared_evidence_finds_all_seeded_stale_links(self):
+        result = shared_evidence_experiment()
+        self.assertEqual(5, result["stale_dependencies_found"])
+        self.assertEqual(0, result["false_negatives"])
+        self.assertTrue(result["acceptance_passed"])
+
+    def test_new_evidence_version_invalidates_pinned_dependencies(self):
+        result = shared_evidence_experiment()
+        self.assertEqual(3, sum(row["status"] == "superseded" for row in result["after"]))
+
+    def test_expiry_invalidates_every_dependent_claim(self):
+        result = shared_evidence_experiment()
+        self.assertEqual(2, sum(row["status"] == "expired" for row in result["after"]))
+
+    def test_applicability_is_separate_from_evidence_freshness(self):
+        result = shared_evidence_experiment()
+        self.assertEqual(1, result["applicability_exclusions"])
+        self.assertEqual(1, sum(row["status"] == "not_applicable" for row in result["after"]))
+
+    def test_missing_shared_evidence_is_visible(self):
+        link = EvidenceDependency("claims", "usage-logging", "missing", 1, "applicable", "Expected platform control")
+        self.assertEqual("missing", dependency_statuses([], [link], date(2026, 10, 28))[0]["status"])
+
+    def test_control_mismatch_is_rejected_as_current(self):
+        item = SharedEvidence("platform", "model-card", 1, "x.md", "2026-01-01", "2026-12-31", "reviewer")
+        link = EvidenceDependency("claims", "usage-logging", "platform", 1, "applicable", "Incorrectly linked")
+        self.assertEqual("control_mismatch", dependency_statuses([item], [link], date(2026, 10, 28))[0]["status"])
+
+    def test_duplicate_shared_evidence_version_is_rejected(self):
+        item = SharedEvidence("platform", "usage-logging", 1, "x.md", "2026-01-01", "2026-12-31", "reviewer")
+        with self.assertRaisesRegex(ValueError, "duplicate evidence version"):
+            dependency_statuses([item, item], [], date(2026, 10, 28))
+
+    def test_applicability_requires_rationale(self):
+        link = EvidenceDependency("claims", "usage-logging", "platform", 1, "pending", "")
+        with self.assertRaisesRegex(ValueError, "rationale"):
+            dependency_statuses([], [link], date(2026, 10, 28))
+
 
 if __name__ == "__main__":
     unittest.main()
+
